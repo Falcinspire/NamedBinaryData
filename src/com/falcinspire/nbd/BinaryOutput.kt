@@ -8,38 +8,45 @@ import kotlin.reflect.KClass
  * @version Jun/14/2017 (12:12 AM)
  */
 
+fun writeFunctionForClass(obj : Any) : ((DataOutput, Any) -> Unit)? {
+    writeFunctions.forEach {
+        if (it.key.isInstance(obj)) return it.value
+    }
+    throw IllegalArgumentException("${obj::class.simpleName} is not a supported data type!")
+}
+
 val writeFunctions = mapOf<KClass<*>, (DataOutput, Any) -> Unit>(
-        Compound::class to {output, value -> output.writeCompound((value as Compound))},
-        Array<Any>::class to {output, value -> output.writeArray((value as Array<Any>))},
-        Boolean::class to {output, value -> output.writeBoolean((value as Boolean))},
-        Byte::class to {output, value -> output.writeByte((value as Byte).toInt())},
-        Short::class to {output, value -> output.writeShort((value as Short).toInt())},
-        Int::class to {output, value -> output.writeInt((value as Int))},
-        Long::class to {output, value -> output.writeLong((value as Long))},
-        Float::class to {output, value -> output.writeFloat((value as Float))},
-        Double::class to {output, value -> output.writeDouble((value as Double))},
-        String::class to {output, value -> output.writeUTF((value as String))},
-        BooleanArray::class to {output, value -> output.writeBooleanArray((value as BooleanArray))},
-        ByteArray::class to {output, value -> output.writeByteArray((value as ByteArray))},
-        ShortArray::class to {output, value -> output.writeShortArray((value as ShortArray))},
-        IntArray::class to { output, value -> output.writeIntArray((value as IntArray))},
-        LongArray::class to { output, value -> output.writeLongArray((value as LongArray))},
-        FloatArray::class to { output, value -> output.writeFloatArray((value as FloatArray))},
-        DoubleArray::class to {output, value -> output.writeDoubleArray((value as DoubleArray))},
-        Array<String>::class to {output, value -> output.writeStringArray((value as Array<String>))}
+        BinaryTypes.COMPOUND.clazz to {output, value -> output.writeCompound((value as Compound))},
+        BinaryTypes.LIST.clazz to {output, value -> output.writeList((value as List<Any>))},
+        BinaryTypes.BOOLEAN.clazz to {output, value -> output.writeBoolean((value as Boolean))},
+        BinaryTypes.BYTE.clazz to {output, value -> output.writeByte((value as Byte).toInt())},
+        BinaryTypes.SHORT.clazz to {output, value -> output.writeShort((value as Short).toInt())},
+        BinaryTypes.INT.clazz to {output, value -> output.writeInt((value as Int))},
+        BinaryTypes.LONG.clazz to {output, value -> output.writeLong((value as Long))},
+        BinaryTypes.FLOAT.clazz to {output, value -> output.writeFloat((value as Float))},
+        BinaryTypes.DOUBLE.clazz to {output, value -> output.writeDouble((value as Double))},
+        BinaryTypes.STRING.clazz to {output, value -> output.writeUTF((value as String))},
+        BinaryTypes.ARRAY_BOOLEAN.clazz to {output, value -> output.writeBooleanArray((value as BooleanArray))},
+        BinaryTypes.ARRAY_BYTE.clazz to {output, value -> output.writeByteArray((value as ByteArray))},
+        BinaryTypes.ARRAY_SHORT.clazz to {output, value -> output.writeShortArray((value as ShortArray))},
+        BinaryTypes.ARRAY_INT.clazz to { output, value -> output.writeIntArray((value as IntArray))},
+        BinaryTypes.ARRAY_LONG.clazz to { output, value -> output.writeLongArray((value as LongArray))},
+        BinaryTypes.ARRAY_FLOAT.clazz to { output, value -> output.writeFloatArray((value as FloatArray))},
+        BinaryTypes.ARRAY_DOUBLE.clazz to {output, value -> output.writeDoubleArray((value as DoubleArray))},
+        BinaryTypes.ARRAY_STRING.clazz to {output, value -> output.writeStringArray((value as Array<String>))}
 )
 
-fun DataOutput.writeArray(array : Array<Any>) {
+fun DataOutput.writeList(list: List<Any>) {
 
-    if (array.size == 0) return
+    if (list.size == 0) return
 
-    this.writeInt(array.size)
-    this.writeByte(binaryID(array[0]::class).toInt())
-    val writeFunc = writeFunctions[array[0]::class]
+    this.writeInt(list.size)
+    this.writeByte(binaryID(list[0]).toInt())
+    val writeFunc = writeFunctionForClass(list[0])
 
-    writeFunc ?: throw IllegalArgumentException("${array[0]::class} is not a known type!")
+    writeFunc ?: throw IllegalArgumentException("${list[0]::class} is not a known type!")
 
-    array.forEach { arrayElement ->
+    list.forEach { arrayElement ->
         writeFunc(this, arrayElement)
     }
 }
@@ -54,14 +61,14 @@ fun DataOutput.writeCompound(compound : Compound) {
 
         val key = it.key
         val value = it.value
-        val writeFunc = writeFunctions[it.value::class]
+        val writeFunc = writeFunctionForClass(it.value)
 
-        writeFunc ?: throw IllegalArgumentException("${it.value::class} is not a known type!")
+        writeFunc ?: throw IllegalArgumentException("${it.value::class.simpleName} is not a known type!")
 
         this.writeUTF(it.key)
-        this.writeByte(binaryID(it.value::class).toInt())
+        this.writeByte(binaryID(it.value).toInt())
 
-        println(">> ${it.key}: ${binaryID(it.value::class)}")
+        println(">> ${it.key}: ${binaryID(it.value)}")
 
         writeFunc(this, it.value)
     }

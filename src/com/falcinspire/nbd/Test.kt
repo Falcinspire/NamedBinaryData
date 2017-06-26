@@ -16,27 +16,82 @@ fun main(args : Array<String>) {
     if (!appHomeTestFile.exists()) appHomeTestFile.create()
 
     val c = compoundOf(
-            "Startup" to 1,
-            "Root" to compoundOf(
-                    "Dangerous" to false
+            "Boolean" to true,
+            "Byte" to 0.toByte(),
+            "Short" to 1.toShort(),
+            "Int" to 2,
+            "Long" to 3.toLong(),
+            "Float" to 4.toFloat(),
+            "Double" to 5.toDouble(),
+            "String" to "NeoMc_",
+            "Boolean[]" to BooleanArray(7),
+            "Byte[]" to ByteArray(7),
+            "Short[]" to ShortArray(7),
+            "Int[]" to IntArray(7),
+            "Long[]" to LongArray(7),
+            "Float[]" to FloatArray(7),
+            "Double[]" to DoubleArray(7),
+            "String[]" to Array(7){"Falcinspire"},
+            "Compound" to compoundOf(
+                    "Boolean" to true,
+                    "Byte" to 0.toByte(),
+                    "Short" to 1.toShort(),
+                    "Int" to 2,
+                    "Long" to 3.toLong(),
+                    "Float" to 4.toFloat(),
+                    "Double" to 5.toDouble(),
+                    "String" to 6.toString(),
+                    "Boolean[]" to BooleanArray(7),
+                    "Byte[]" to ByteArray(7),
+                    "Short[]" to ShortArray(7),
+                    "Int[]" to IntArray(7),
+                    "Long[]" to LongArray(7),
+                    "Float[]" to FloatArray(7),
+                    "Double[]" to DoubleArray(7),
+                    "String[]" to Array<String>(7){"Falcinspire"},
+                    "List" to listOf(
+                            simpleCompound(),
+                            simpleCompound()
+                    )
             ),
-            "Languages" to arrayOf(
-                    "Java",
-                    "Kotlin",
-                    "Scala"
+            "List" to listOf(
+                    simpleCompound(),
+                    simpleCompound()
             )
     )
 
     BinaryIO.write(c, appHomeTestFile)
     val rc = BinaryIO.read(appHomeTestFile)
 
-    println((rc["Languages"] as Array<String>)[1])
+    println((rc["Boolean"]))
+    println((rc["Byte"]))
+    println((rc["Short"]))
+    println((rc["Int"]))
+    println((rc["List"] as List<Compound>)[0]["Boolean"])
 
+}
+
+fun simpleCompound() : Compound {
+    return compoundOf(
+            "Boolean" to true,
+            "Byte" to 0.toByte(),
+            "Short" to 1.toShort(),
+            "Int" to 2,
+            "Long" to 3.toLong(),
+            "Float" to 4.toFloat(),
+            "Double" to 5.toDouble(),
+            "String" to 6.toString(),
+            "Boolean[]" to BooleanArray(7),
+            "Byte[]" to ByteArray(7),
+            "Short[]" to ShortArray(7),
+            "Int[]" to IntArray(7),
+            "Long[]" to LongArray(7),
+            "Float[]" to FloatArray(7),
+            "Double[]" to DoubleArray(7),
+            "String[]" to Array<String>(7){"Falcinspire"}
+    )
 }
 
 fun File.create() {
     this.createNewFile()
-}
-
-class Test {
 }

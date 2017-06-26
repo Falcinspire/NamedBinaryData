@@ -8,34 +8,34 @@ import java.io.DataInput
  */
 
 val readFunctions = mapOf<Byte, (DataInput) -> Any>(
-        binaryID(Compound::class) to {input -> input.readCompound()},
-        binaryID(Array<Any>::class) to {input -> input.readArray()},
-        binaryID(Boolean::class) to {input -> (input.readByte() == 1.toByte())},
-        binaryID(Byte::class) to {input -> input.readByte()},
-        binaryID(Short::class) to {input -> input.readShort()},
-        binaryID(Int::class) to {input -> input.readInt()},
-        binaryID(Long::class) to {input -> input.readLong()},
-        binaryID(Float::class) to {input -> input.readFloat()},
-        binaryID(Double::class) to {input -> input.readDouble()},
-        binaryID(String::class) to {input -> input.readUTF()},
-        binaryID(BooleanArray::class) to {input -> input.readBooleanArray()},
-        binaryID(ByteArray::class) to {input -> input.readByteArray()},
-        binaryID(ShortArray::class) to {input -> input.readShortArray()},
-        binaryID(IntArray::class) to { input -> input.readIntArray()},
-        binaryID(LongArray::class) to { input -> input.readLongArray()},
-        binaryID(FloatArray::class) to { input -> input.readFloatArray()},
-        binaryID(DoubleArray::class) to {input -> input.readDoubleArray()},
-        binaryID(Array<String>::class) to {input -> input.readStringArray()}
+        BinaryTypes.COMPOUND.id to {input -> input.readCompound()},
+        BinaryTypes.LIST.id to {input -> input.readArray()},
+        BinaryTypes.BOOLEAN.id to {input -> (input.readByte() == 1.toByte())},
+        BinaryTypes.BYTE.id to {input -> input.readByte()},
+        BinaryTypes.SHORT.id to {input -> input.readShort()},
+        BinaryTypes.INT.id to {input -> input.readInt()},
+        BinaryTypes.LONG.id to {input -> input.readLong()},
+        BinaryTypes.FLOAT.id to {input -> input.readFloat()},
+        BinaryTypes.DOUBLE.id to {input -> input.readDouble()},
+        BinaryTypes.STRING.id to {input -> input.readUTF()},
+        BinaryTypes.ARRAY_BOOLEAN.id to {input -> input.readBooleanArray()},
+        BinaryTypes.ARRAY_BYTE.id to {input -> input.readByteArray()},
+        BinaryTypes.ARRAY_SHORT.id to {input -> input.readShortArray()},
+        BinaryTypes.ARRAY_INT.id to { input -> input.readIntArray()},
+        BinaryTypes.ARRAY_LONG.id to { input -> input.readLongArray()},
+        BinaryTypes.ARRAY_FLOAT.id to { input -> input.readFloatArray()},
+        BinaryTypes.ARRAY_DOUBLE.id to {input -> input.readDoubleArray()},
+        BinaryTypes.ARRAY_STRING.id to {input -> input.readStringArray()}
 )
 
-fun DataInput.readArray() : Array<Any> {
+fun DataInput.readArray() : List<Any> {
     val size = this.readInt()
     val type = this.readByte()
     val readFunc = readFunctions[type]
 
     readFunc ?: throw IllegalArgumentException("${type} is not a known type!")
 
-    val array = Array<Any>(size) {
+    val array = List<Any>(size) {
         readFunc(this)
     }
 

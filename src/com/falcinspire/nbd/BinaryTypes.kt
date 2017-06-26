@@ -7,24 +7,27 @@ import kotlin.reflect.KClass
  * @version Jun/14/2017 (12:24 AM)
  */
 
-fun binaryID(clazz : KClass<*>) : Byte {
-    return BinaryTypes.fromType[clazz] ?: throw IllegalArgumentException("${clazz} is not a supported data type!")
+fun binaryID(obj : Any) : Byte {
+    BinaryTypes.ordinal.forEach {
+        if (it.clazz.isInstance(obj)) return it.id
+    }
+    throw IllegalArgumentException("${obj::class.simpleName} is not a supported data type!")
 }
 
 fun binaryType(id : Byte) : KClass<*> {
     return BinaryTypes.fromID[id] ?: throw IllegalArgumentException("${id} is not a supported id!")
 }
 
-fun validType(clazz : KClass<*>) : Boolean {
+fun validType(obj : Any) : Boolean {
     BinaryTypes.ordinal.forEach {
-        if (it.clazz == clazz) return true
+        if (it.clazz.isInstance(obj)) return true
     }
     return false
 }
 
 enum class BinaryTypes(val clazz : KClass<*>, val id : Byte) {
     COMPOUND(Compound::class, 1.toByte()),
-    ARRAY(Array<Any>::class, 2.toByte()),
+    LIST(List::class, 2.toByte()),
     BOOLEAN(Boolean::class, 3.toByte()),
     BYTE(Byte::class, 4.toByte()),
     SHORT(Short::class, 5.toByte()),
